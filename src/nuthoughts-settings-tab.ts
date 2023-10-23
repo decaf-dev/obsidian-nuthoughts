@@ -14,13 +14,18 @@ export default class NuThoughtsSettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		new Setting(containerEl).setName("Port").addText((text) =>
-			text
-				.setValue(this.plugin.settings.port.toString())
-				.onChange(async (value) => {
-					this.plugin.settings.port = Number(value);
-					await this.plugin.saveSettings();
-				})
-		);
+		new Setting(containerEl)
+			.setName("Port")
+			.setDesc(
+				"The port to run the server on. Defaults to 8555 if not set"
+			)
+			.addText((text) =>
+				text
+					.setValue(this.plugin.settings.port.toString())
+					.onChange(async (value) => {
+						this.plugin.settings.port = Number(value);
+						await this.plugin.saveSettings();
+					})
+			);
 	}
 }

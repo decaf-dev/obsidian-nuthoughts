@@ -7,7 +7,7 @@ interface NuThoughtsSettings {
 }
 
 const DEFAULT_SETTINGS: NuThoughtsSettings = {
-	port: 8000,
+	port: 8555,
 };
 
 export default class NuThoughtsPlugin extends Plugin {

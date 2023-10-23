@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"id": "obsidian-nuthoughts",
+	"name": "NuThoughts server",
+	"version": "0.1.0",
+	"minAppVersion": "1.2.0",
+	"description": "NuThoughts server for Obsidian",
+	"author": "Trey Wallis",
+	"authorUrl": "https://github.com/trey-wallis",
+	"fundingUrl": "https://buymeacoffee.com/trey-wallis",
 	"isDesktopOnly": false
 }

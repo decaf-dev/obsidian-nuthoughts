@@ -1,12 +1,15 @@
 import { Notice, Plugin } from "obsidian";
+import * as Bun from "bun";
 
 import NuThoughtsSettingsTab from "./nuthoughts-settings-tab";
 
 interface NuThoughtsSettings {
 	port: number;
+	shouldRunOnStartup: boolean;
 }
 
 const DEFAULT_SETTINGS: NuThoughtsSettings = {
+	shouldRunOnStartup: true,
 	port: 8555,
 };
 
@@ -20,10 +23,9 @@ export default class NuThoughtsPlugin extends Plugin {
 		this.addCommand({
 			id: "run-server",
 			name: "Run NuThoughts server",
-			checkCallback: () => {
+			callback: () => {
 				new Notice("Starting NuThoughts server");
 				this.runServer();
-				return true;
 			},
 		});
 
@@ -32,6 +34,10 @@ export default class NuThoughtsPlugin extends Plugin {
 
 		this.serverStatusEl = this.addStatusBarItem();
 		this.updateServerStatus(false);
+
+		if (this.settings.shouldRunOnStartup) {
+			this.runServer();
+		}
 	}
 
 	onunload() {
@@ -52,6 +58,13 @@ export default class NuThoughtsPlugin extends Plugin {
 
 	private runServer() {
 		this.updateServerStatus(true);
+		const server = Bun.serve({
+			fetch() {
+				return new Response("Hello, Obsidian!");
+			},
+		});
+
+		console.log(`Listening on localhost:${server.port}`);
 	}
 
 	private stopServer() {
@@ -59,9 +72,9 @@ export default class NuThoughtsPlugin extends Plugin {
 	}
 
 	private updateServerStatus(isOn: boolean) {
-		let text = "NuThoughts server stopped";
+		let text = "NuThoughts stopped";
 		if (isOn) {
-			text = "NuThoughts server running";
+			text = "NuThoughts running";
 		}
 		this.serverStatusEl.setText(text);
 	}

@@ -1,16 +1,19 @@
 import { Notice, Plugin } from "obsidian";
-import * as Bun from "bun";
+import * as fs from "fs";
+import { exec } from "child_process";
 
 import NuThoughtsSettingsTab from "./nuthoughts-settings-tab";
 
 interface NuThoughtsSettings {
 	port: number;
 	shouldRunOnStartup: boolean;
+	serverFilePath: string;
 }
 
 const DEFAULT_SETTINGS: NuThoughtsSettings = {
 	shouldRunOnStartup: true,
 	port: 8555,
+	serverFilePath: "server.js",
 };
 
 export default class NuThoughtsPlugin extends Plugin {
@@ -58,13 +61,17 @@ export default class NuThoughtsPlugin extends Plugin {
 
 	private runServer() {
 		this.updateServerStatus(true);
-		const server = Bun.serve({
-			fetch() {
-				return new Response("Hello, Obsidian!");
-			},
-		});
-
-		console.log(`Listening on localhost:${server.port}`);
+		if (!fs.existsSync(this.settings.serverFilePath)) {
+			new Notice("Server file not found");
+			return;
+		}
+		exec(
+			`bun ${this.settings.serverFilePath}`,
+			(error: any, stdout: any, stderr: any) => {
+				console.log(stdout);
+			}
+		);
+		new Notice("Server is running on port " + this.settings.port);
 	}
 
 	private stopServer() {

@@ -10,7 +10,6 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "isolatedModules": true,
-    "types": ["bun-types"],
 	  "strictNullChecks": true,
     "lib": [
       "DOM",
@@ -21,5 +20,5 @@
   },
   "include": [
     "**/*.ts"
-  ]
+  ],
 }

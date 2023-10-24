@@ -9,7 +9,7 @@ import builtins from "builtin-modules";
 const prod = process.argv[2] === "production";
 
 if (!prod) {
-	const watcher = chokidar.watch(["external/", "src/"], {
+	const watcher = chokidar.watch(["plugin/", "server/"], {
 		persistent: true,
 	});
 
@@ -28,22 +28,28 @@ build();
 const throttleBuild = _.throttle(build, 0);
 
 async function build() {
-	//Server file
 	console.log("rebuilding...");
-	const SERVER_ENTRYPOINT = "./external/server.ts";
-	await _buildBun(SERVER_ENTRYPOINT);
 
 	//Main file
-	const MAIN_ENTRYPOINT = path.join(__dirname, "src", "main.ts");
+	const MAIN_ENTRYPOINT = path.join(__dirname, "plugin", "src", "main.ts");
 	const MAIN_OUTPUT_PATH = path.join(__dirname, "dist", "main.js");
-	await _buildBun(MAIN_ENTRYPOINT);
+	await _buildBun(MAIN_ENTRYPOINT, "node");
 	_convertToCommonJS(MAIN_OUTPUT_PATH);
+
+	//Server file
+	const SERVER_ENTRYPOINT = path.join(
+		__dirname,
+		"server",
+		"src",
+		"server.ts"
+	);
+	await _buildBun(SERVER_ENTRYPOINT, "bun");
 
 	//Manifest file
 	await _copyManifestFile();
 }
 
-async function _buildBun(entrypoint) {
+async function _buildBun(entrypoint, target) {
 	return Bun.build({
 		entrypoints: [entrypoint],
 		outdir: path.join(__dirname, "dist"),
@@ -64,7 +70,7 @@ async function _buildBun(entrypoint) {
 			...builtins,
 		],
 		minify: prod,
-		target: "node",
+		target,
 	});
 }
 

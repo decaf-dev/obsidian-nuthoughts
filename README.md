@@ -36,3 +36,19 @@ Bun updates
 
 -   [ ] Bundle into one file once Bun supports polyfill
 -   [ ] Remove Babel once Bun supports CommonJS
+
+## Developer
+
+### Debugging
+
+Check if a child process is running
+
+```bash
+lsof -i tcp:<port>
+```
+
+Kill the process
+
+```bash
+kill -9 <pid>
+```

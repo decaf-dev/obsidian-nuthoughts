@@ -21,9 +21,9 @@ if (!prod) {
 			.on("change", () => throttleBuild())
 			.on("unlink", () => throttleBuild());
 	});
-} else {
-	build();
 }
+
+build();
 
 const throttleBuild = _.throttle(build, 0);
 

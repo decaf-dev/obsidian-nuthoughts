@@ -6,9 +6,6 @@ import _ from "lodash";
 import babel from "@babel/core";
 import fs from "fs";
 
-const filePath = "./dist/main.js";
-const outputFile = "./dist/main.js";
-
 const prod = process.argv[2] === "production";
 
 if (!prod) {
@@ -62,9 +59,11 @@ async function _buildBun() {
 }
 
 function _convertToCommonJS() {
-	const transformed = babel.transformFileSync(filePath, {
+	const INPUT_PATH = "./dist/main.js";
+	const transformed = babel.transformFileSync(INPUT_PATH, {
 		presets: ["@babel/preset-env"],
 	});
 
-	fs.writeFileSync(outputFile, transformed.code);
+	const OUTPUT_PATH = "./dist/main.js";
+	fs.writeFileSync(OUTPUT_PATH, transformed.code);
 }

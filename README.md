@@ -6,12 +6,33 @@ This is an Obsidian plugin that runs a Bun.sh server. It allows a [NuThoughts ap
 
 ## Installation
 
-1. Drag a copy of the plugin files into your `./obsidian/plugins` folder
+### From release
+
+1. Install the plugin using [Obsidian BRAT](https://github.com/TfTHacker/obsidian42-brat)
 2. Enable the plugin
-3. Configure the server
+3. Configure the server file path
+
+### From clone
+
+1. Clone the github repository
+2. Install [bun](https://bun.sh)
+3. Build the project `bun run build`
+4. Add a symbolic link to your vault's plugin folder
+
+-   `ln -s /obsidian-nuthoughts/dist /.obsidian/plugins/obsidian-nuthoughts`
+
+5. Enable the plugin
+6. Configure the server file path
 
 ## Usage
 
 When you open Obsidian, the server will be running.
 
-There is also a manual run server command.
+There is also a manual run server command if you disable run on start up.
+
+## Roadmap
+
+Bun updates
+
+-   [ ] Bundle into one file once Bun supports polyfill
+-   [ ] Remove Babel once Bun supports CommonJS

@@ -6,8 +6,8 @@ import _ from "lodash";
 import babel from "@babel/core";
 import fs from "fs";
 
-const filePath = "./main.js";
-const outputFile = "./main.js";
+const filePath = "./dist/main.js";
+const outputFile = "./dist/main.js";
 
 const prod = process.argv[2] === "production";
 
@@ -16,26 +16,30 @@ if (!prod) {
 		persistent: true,
 	});
 
-	watcher
-		.on("add", () => throttleBuild())
-		.on("change", () => throttleBuild())
-		.on("unlink", () => throttleBuild());
+	watcher.on("ready", () => {
+		console.log("watching for changes...");
+
+		watcher
+			.on("add", () => throttleBuild())
+			.on("change", () => throttleBuild())
+			.on("unlink", () => throttleBuild());
+	});
 } else {
 	build();
 }
 
-const throttleBuild = _.throttle(build, 1000);
+const throttleBuild = _.throttle(build, 0);
 
 async function build() {
 	console.log("rebuilding...");
 	await _buildBun();
-	//_convertToCommonJS();
+	_convertToCommonJS();
 }
 
 async function _buildBun() {
 	return Bun.build({
 		entrypoints: ["./src/main.ts"],
-		outdir: ".",
+		outdir: "./dist/",
 		external: [
 			"obsidian",
 			"electron",
@@ -53,8 +57,7 @@ async function _buildBun() {
 			...builtins,
 		],
 		minify: prod,
-		target: "browser",
-		sourcemap: !prod,
+		target: "node",
 	});
 }
 

@@ -1,21 +1,21 @@
 import { Notice, Plugin } from "obsidian";
-import { ChildProcess, exec } from "child_process";
+import { ChildProcess, spawn } from "child_process";
 import * as fs from "fs";
 
-import NuThoughtsSettingsTab from "./nuthoughts-settings-tab";
+import SettingsTab from "./settings-tab";
 
 interface NuThoughtsSettings {
 	port: number;
 	shouldRunOnStartup: boolean;
-	serverFilePath: string;
-	bunPath: string;
+	serverPath: string;
+	executionPath: string;
 }
 
 const DEFAULT_SETTINGS: NuThoughtsSettings = {
 	shouldRunOnStartup: true,
 	port: 8555,
-	serverFilePath: "",
-	bunPath: "",
+	serverPath: "",
+	executionPath: "",
 };
 
 export default class NuThoughtsPlugin extends Plugin {
@@ -31,7 +31,6 @@ export default class NuThoughtsPlugin extends Plugin {
 			id: "start-server",
 			name: "Start server",
 			callback: () => {
-				new Notice("Starting NuThoughts server");
 				this.runServer();
 			},
 		});
@@ -40,13 +39,12 @@ export default class NuThoughtsPlugin extends Plugin {
 			id: "stop-server",
 			name: "Stop server",
 			callback: () => {
-				new Notice("Stopping NuThoughts server");
 				this.stopServer();
 			},
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new NuThoughtsSettingsTab(this.app, this));
+		this.addSettingTab(new SettingsTab(this.app, this));
 
 		this.serverStatusEl = this.addStatusBarItem();
 		this.updateServerStatus(false);
@@ -81,43 +79,46 @@ export default class NuThoughtsPlugin extends Plugin {
 		}
 
 		this.updateServerStatus(true);
-		const exists = fs.existsSync(this.settings.serverFilePath);
+		const exists = fs.existsSync(this.settings.serverPath);
 		if (!exists) {
 			new Notice(
-				"NuThoughts cannot find server.js. Please check the plugin settings"
+				"NuThoughts cannot find the server file. Please check the plugin settings"
 			);
 			return;
 		}
 
-		const title = "NuThoughts server";
-		const child = exec(
-			`${this.settings.bunPath} ${this.settings.serverFilePath}`,
-			(error: any, stdout: any, stderr: any) => {
-				console.log(`${title} error: ${error}`);
-				console.log(`${title} stdout: ${stdout}`);
-				console.log(`${title} stderr: ${stderr}`);
+		const child = spawn(
+			this.settings.executionPath,
+			[this.settings.serverPath],
+			{
+				stdio: ["pipe", "pipe", "pipe", "ipc"], // Use IPC to communicate between parent and child
 			}
 		);
 		this.serverProcess = child;
 
-		process.on("exit", () => {
-			child.kill();
+		console.log(`Created child process: ${child.pid}`);
+
+		let stderrString = "";
+		child.stderr?.on("data", (data) => {
+			stderrString += data.toString("utf-8");
 		});
 
-		process.on("SIGINT", () => {
-			child.kill();
-			process.exit(1); // or process.exitCode = 1;
+		child.on("exit", (code) => {
+			console.log(`Child exited with code: ${code}`);
+			console.log(`Captured stderr:\n${stderrString}`);
 		});
 
-		process.on("SIGTERM", () => {
-			child.kill();
-			process.exit(1); // or process.exitCode = 1;
+		child.on("message", (message) => {
+			if (message === "started") {
+				console.log("Child started and is monitoring parent.");
+			} else if (message === "error") {
+				new Notice("NuThoughts server failed to start");
+			}
 		});
-
-		new Notice(
-			"NuThoughts server is running on port " + this.settings.port
-		);
 		this.isServerRunning = true;
+		new Notice(
+			"NuThoughts server is running on port: " + this.settings.port
+		);
 	}
 
 	private stopServer() {
@@ -129,6 +130,7 @@ export default class NuThoughtsPlugin extends Plugin {
 		this.isServerRunning = false;
 		this.serverProcess.kill();
 		this.serverProcess = null;
+		new Notice("Stopped NuThoughts server");
 	}
 
 	private updateServerStatus(isOn: boolean) {

@@ -1,7 +1,7 @@
 import * as net from "net";
 import * as selfsigned from "selfsigned";
 
-export const setupHeartbeatSocket = (port: string | number) => {
+export const setupParentProcessConnection = (port: string | number) => {
 	const client = net.createConnection(Number(port), "localhost", () => {
 		// console.log("Connected to server");
 	});

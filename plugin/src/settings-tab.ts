@@ -74,7 +74,7 @@ export default class SettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Certificate common name")
 			.setDesc(
-				"The common name to use for the self-signed certificate. Defaults to the hostname of your computer if not set"
+				"The common name to use for the self-signed certificate. This will be used if the above setting is disabled."
 			)
 			.addText((text) =>
 				text

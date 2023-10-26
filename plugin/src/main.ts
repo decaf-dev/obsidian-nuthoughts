@@ -82,7 +82,7 @@ export default class NuThoughtsPlugin extends Plugin {
 		}
 
 		this.updateServerStatus(true);
-		this.setupHeartbeat();
+		this.setupProcessConnection();
 
 		const vaultPath = (this.app.vault.adapter as any).basePath;
 		const serverExePath = path.join(
@@ -102,6 +102,7 @@ export default class NuThoughtsPlugin extends Plugin {
 			this.settings.serverPort.toString(),
 			this.settings.heartbeatPort.toString(),
 			certCommonName,
+			vaultPath,
 		]);
 
 		childProcess.stdout.on("data", (data) => {
@@ -122,7 +123,7 @@ export default class NuThoughtsPlugin extends Plugin {
 		this.isServerRunning = true;
 	}
 
-	private setupHeartbeat() {
+	private setupProcessConnection() {
 		const server = net.createServer((socket) => {
 			socket.on("end", () => {
 				console.log("Client disconnected");

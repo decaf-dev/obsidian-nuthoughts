@@ -32,6 +32,7 @@ There is also a manual run server command if you disable run on start up.
 
 Bun updates
 
+-   [ ] Bundle into plugin itself once Bun supports polyfill
 -   [ ] Remove Babel once Bun supports CommonJS
 
 ## Developer

@@ -14,6 +14,8 @@ export default class SettingsTab extends PluginSettingTab {
 
 		containerEl.empty();
 
+		new Setting(containerEl).setHeading().setName("Server");
+
 		new Setting(containerEl)
 			.setName("Run on start up")
 			.addToggle((toggle) =>
@@ -26,7 +28,7 @@ export default class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Server Port")
+			.setName("Server port")
 			.setDesc(
 				"The port to run the http server on. Defaults to 8123 if not set"
 			)
@@ -40,7 +42,7 @@ export default class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Heartbeat Port")
+			.setName("Heartbeat port")
 			.setDesc(
 				"The port to run the heartbeat server on. This is necessary to clean up the child process when Obsidian closes. Defaults to 8124 if not set"
 			)
@@ -49,6 +51,36 @@ export default class SettingsTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.heartbeatPort.toString())
 					.onChange(async (value) => {
 						this.plugin.settings.heartbeatPort = Number(value);
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl).setHeading().setName("TLS");
+
+		new Setting(containerEl)
+			.setName("Use computer hostname as certificate common name")
+			.setDesc(
+				"If enabled, the certificate common name will be set to the hostname of your computer."
+			)
+			.addText((text) =>
+				text
+					.setValue(this.plugin.settings.heartbeatPort.toString())
+					.onChange(async (value) => {
+						this.plugin.settings.heartbeatPort = Number(value);
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Certificate common name")
+			.setDesc(
+				"The common name to use for the self-signed certificate. Defaults to the hostname of your computer if not set"
+			)
+			.addText((text) =>
+				text
+					.setValue(this.plugin.settings.certCommonName)
+					.onChange(async (value) => {
+						this.plugin.settings.certCommonName = value;
 						await this.plugin.saveSettings();
 					})
 			);

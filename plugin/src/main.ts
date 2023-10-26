@@ -1,7 +1,7 @@
 import { Notice, Plugin } from "obsidian";
 import { ChildProcess, spawn } from "child_process";
+import * as os from "os";
 import * as path from "path";
-import * as fs from "fs";
 import * as net from "net";
 
 import SettingsTab from "./settings-tab";
@@ -10,12 +10,16 @@ interface NuThoughtsSettings {
 	serverPort: number;
 	heartbeatPort: number;
 	shouldRunOnStartup: boolean;
+	certCommonName: string;
+	useHostNameAsCommonName: boolean;
 }
 
 const DEFAULT_SETTINGS: NuThoughtsSettings = {
 	shouldRunOnStartup: true,
 	serverPort: 8123,
 	heartbeatPort: 8124,
+	certCommonName: "",
+	useHostNameAsCommonName: true,
 };
 
 export default class NuThoughtsPlugin extends Plugin {
@@ -77,6 +81,9 @@ export default class NuThoughtsPlugin extends Plugin {
 			return;
 		}
 
+		this.updateServerStatus(true);
+		this.setupHeartbeat();
+
 		const vaultPath = (this.app.vault.adapter as any).basePath;
 		const serverExePath = path.join(
 			vaultPath,
@@ -86,20 +93,15 @@ export default class NuThoughtsPlugin extends Plugin {
 			"server"
 		);
 
-		this.updateServerStatus(true);
-		const exists = fs.existsSync(serverExePath);
-		if (!exists) {
-			new Notice(
-				"NuThoughts cannot find the server executable. Please update the server path in the plugin settings."
-			);
-			return;
-		}
-
-		this.setupHeartbeat();
+		const computerHostName = os.hostname().toLowerCase();
+		const certCommonName = this.settings.useHostNameAsCommonName
+			? computerHostName
+			: this.settings.certCommonName;
 
 		const childProcess = spawn(`${serverExePath}`, [
 			this.settings.serverPort.toString(),
 			this.settings.heartbeatPort.toString(),
+			certCommonName,
 		]);
 
 		childProcess.stdout.on("data", (data) => {
@@ -128,9 +130,9 @@ export default class NuThoughtsPlugin extends Plugin {
 		});
 
 		server.listen(this.settings.heartbeatPort, () => {
-			console.log(
-				`Heartbeat server listening on port: ${this.settings.heartbeatPort}`
-			);
+			// console.log(
+			// 	`Heartbeat server listening on port: ${this.settings.heartbeatPort}`
+			// );
 		});
 		this.heartbeatServer = server;
 	}

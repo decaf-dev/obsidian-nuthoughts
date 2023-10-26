@@ -62,11 +62,11 @@ export default class SettingsTab extends PluginSettingTab {
 			.setDesc(
 				"If enabled, the certificate common name will be set to the hostname of your computer."
 			)
-			.addText((text) =>
-				text
-					.setValue(this.plugin.settings.heartbeatPort.toString())
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.useHostNameAsCommonName)
 					.onChange(async (value) => {
-						this.plugin.settings.heartbeatPort = Number(value);
+						this.plugin.settings.useHostNameAsCommonName = value;
 						await this.plugin.saveSettings();
 					})
 			);

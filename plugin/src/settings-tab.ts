@@ -55,6 +55,20 @@ export default class SettingsTab extends PluginSettingTab {
 					})
 			);
 
+		new Setting(containerEl)
+			.setName("Save folder")
+			.setDesc(
+				"The folder to save thoughts to. Defaults to the vault root"
+			)
+			.addText((text) =>
+				text
+					.setValue(this.plugin.settings.saveFolder)
+					.onChange(async (value) => {
+						this.plugin.settings.saveFolder = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
 		new Setting(containerEl).setHeading().setName("TLS");
 
 		new Setting(containerEl)

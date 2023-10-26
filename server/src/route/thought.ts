@@ -1,6 +1,7 @@
 import { Thought } from "../types";
 import { validateFields } from "../validation";
 import * as path from "path";
+import * as fs from "fs";
 
 export const handlePostThought = async (
 	body: ReadableStream | null,
@@ -29,6 +30,12 @@ const saveThought = async (thought: Thought, vaultPath: string) => {
 	const { creationTime, text } = thought;
 	const fileName = `nuthought-${creationTime}.md`;
 	const filePath = path.join(vaultPath, fileName);
+
 	console.log("Saving thought to", filePath);
+
+	try {
+		await fs.promises.mkdir(vaultPath);
+	} catch (err: unknown) {}
+
 	await Bun.write(filePath, text);
 };

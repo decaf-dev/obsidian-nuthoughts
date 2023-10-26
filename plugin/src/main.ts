@@ -12,6 +12,7 @@ interface NuThoughtsSettings {
 	shouldRunOnStartup: boolean;
 	certCommonName: string;
 	useHostNameAsCommonName: boolean;
+	saveFolder: string;
 }
 
 const DEFAULT_SETTINGS: NuThoughtsSettings = {
@@ -20,6 +21,7 @@ const DEFAULT_SETTINGS: NuThoughtsSettings = {
 	heartbeatPort: 8124,
 	certCommonName: "",
 	useHostNameAsCommonName: true,
+	saveFolder: "",
 };
 
 export default class NuThoughtsPlugin extends Plugin {
@@ -93,6 +95,8 @@ export default class NuThoughtsPlugin extends Plugin {
 			"server"
 		);
 
+		const savePath = path.join(vaultPath, this.settings.saveFolder);
+
 		const computerHostName = os.hostname().toLowerCase();
 		const certCommonName = this.settings.useHostNameAsCommonName
 			? computerHostName
@@ -102,7 +106,7 @@ export default class NuThoughtsPlugin extends Plugin {
 			this.settings.serverPort.toString(),
 			this.settings.heartbeatPort.toString(),
 			certCommonName,
-			vaultPath,
+			savePath,
 		]);
 
 		childProcess.stdout.on("data", (data) => {

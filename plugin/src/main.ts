@@ -10,14 +10,12 @@ interface NuThoughtsSettings {
 	serverPort: number;
 	heartbeatPort: number;
 	shouldRunOnStartup: boolean;
-	serverPath: string;
 }
 
 const DEFAULT_SETTINGS: NuThoughtsSettings = {
 	shouldRunOnStartup: true,
 	serverPort: 8123,
 	heartbeatPort: 8124,
-	serverPath: "",
 };
 
 export default class NuThoughtsPlugin extends Plugin {
@@ -79,8 +77,17 @@ export default class NuThoughtsPlugin extends Plugin {
 			return;
 		}
 
+		const vaultPath = (this.app.vault.adapter as any).basePath;
+		const serverExePath = path.join(
+			vaultPath,
+			".obsidian",
+			"plugins",
+			"obsidian-nuthoughts",
+			"server"
+		);
+
 		this.updateServerStatus(true);
-		const exists = fs.existsSync(this.settings.serverPath);
+		const exists = fs.existsSync(serverExePath);
 		if (!exists) {
 			new Notice(
 				"NuThoughts cannot find the server executable. Please update the server path in the plugin settings."
@@ -90,9 +97,7 @@ export default class NuThoughtsPlugin extends Plugin {
 
 		this.setupHeartbeat();
 
-		const serverPath = path.join(this.settings.serverPath, "server");
-		const childProcess = spawn(`${serverPath}`, [
-			"server",
+		const childProcess = spawn(`${serverExePath}`, [
 			this.settings.serverPort.toString(),
 			this.settings.heartbeatPort.toString(),
 		]);

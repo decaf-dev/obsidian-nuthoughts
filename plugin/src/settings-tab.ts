@@ -26,21 +26,7 @@ export default class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Server path")
-			.setDesc(
-				"The path to the server executable, excluding the server name. e.g. /users/trey/desktop"
-			)
-			.addText((text) =>
-				text
-					.setValue(this.plugin.settings.serverPath)
-					.onChange(async (value) => {
-						this.plugin.settings.serverPath = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("Port")
+			.setName("Server Port")
 			.setDesc(
 				"The port to run the http server on. Defaults to 8123 if not set"
 			)
@@ -54,7 +40,7 @@ export default class SettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Port")
+			.setName("Heartbeat Port")
 			.setDesc(
 				"The port to run the heartbeat server on. This is necessary to clean up the child process when Obsidian closes. Defaults to 8124 if not set"
 			)

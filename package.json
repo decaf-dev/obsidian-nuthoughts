@@ -6,8 +6,7 @@
 	"scripts": {
 		"dev": "bun bun.build.mjs",
 		"build": "bun bun.build.js production",
-		"binary": "bun build --compile --minify ./dist/server.js --outfile ./dist/server",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
+		"binary": "bun build --compile --minify ./dist/server.js --outfile ./dist/server"
 	},
 	"keywords": [],
 	"author": "Trey Wallis",

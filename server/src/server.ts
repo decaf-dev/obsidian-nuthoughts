@@ -4,8 +4,8 @@ import * as net from "net";
 const DEFAULT_SERVER_PORT = 8123;
 const DEFAULT_HEARTBEAT_PORT = 8124;
 
-const serverPort = process.argv[3] || DEFAULT_SERVER_PORT;
-const heartbeatPort = process.argv[4] || DEFAULT_HEARTBEAT_PORT;
+const serverPort = process.argv[2] || DEFAULT_SERVER_PORT;
+const heartbeatPort = process.argv[3] || DEFAULT_HEARTBEAT_PORT;
 
 function setupHeartbeat() {
 	const client = net.createConnection(
@@ -23,8 +23,8 @@ function setupHeartbeat() {
 }
 
 Bun.serve({
-	fetch() {
-		return new Response("Bun!");
+	fetch: () => {
+		return new Response("NuThoughts is running!");
 	},
 	port: Number(serverPort),
 });

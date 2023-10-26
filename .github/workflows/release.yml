@@ -12,10 +12,11 @@ jobs:
               uses: actions/setup-node@v1
               with:
                   node-version: "16.x"
+			- name: Setup Bun Runtime
+  				uses: antongolub/action-setup-bun@v1 # or @v1.x.x
             - name: Build
               id: build
               run: |
-			      curl -fsSL https://bun.sh/install | bash
                   bun install
                   bun run build
 				  bun run binary

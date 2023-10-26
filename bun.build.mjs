@@ -36,14 +36,9 @@ async function build() {
 	await _buildBun(MAIN_ENTRYPOINT, "node");
 	_convertToCommonJS(MAIN_OUTPUT_PATH);
 
-	//Server file
-	const SERVER_ENTRYPOINT = path.join(
-		__dirname,
-		"server",
-		"src",
-		"server.ts"
-	);
-	await _buildBun(SERVER_ENTRYPOINT, "bun");
+	// //Server file
+	// const SERVER_ENTRYPOINT = path.join(__dirname, "server", "src", "index.ts");
+	// await _buildBun(SERVER_ENTRYPOINT, "bun");
 
 	//Manifest file
 	await _copyManifestFile();

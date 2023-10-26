@@ -3,7 +3,7 @@ import * as selfsigned from "selfsigned";
 
 export const setupHeartbeatSocket = (port: string | number) => {
 	const client = net.createConnection(Number(port), "localhost", () => {
-		console.log("Connected to server");
+		// console.log("Connected to server");
 	});
 
 	client.on("end", () => {

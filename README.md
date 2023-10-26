@@ -10,7 +10,6 @@ This is an Obsidian plugin that runs a Bun.sh server. It allows a [NuThoughts ap
 
 1. Install the plugin using [Obsidian BRAT](https://github.com/TfTHacker/obsidian42-brat)
 2. Enable the plugin
-3. Configure the server file path
 
 ### From clone
 
@@ -22,7 +21,6 @@ This is an Obsidian plugin that runs a Bun.sh server. It allows a [NuThoughts ap
 -   `ln -s /obsidian-nuthoughts/dist /.obsidian/plugins/obsidian-nuthoughts`
 
 5. Enable the plugin
-6. Configure the server file path
 
 ## Usage
 
@@ -34,7 +32,6 @@ There is also a manual run server command if you disable run on start up.
 
 Bun updates
 
--   [ ] Bundle into one file once Bun supports polyfill
 -   [ ] Remove Babel once Bun supports CommonJS
 
 ## Developer

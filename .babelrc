@@ -3,5 +3,6 @@
     ["@babel/preset-env", {
       "modules": "commonjs"
     }]
-  ]
+  ],
+	"compact": false
 }

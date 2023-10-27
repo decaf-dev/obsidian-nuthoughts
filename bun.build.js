@@ -6,6 +6,8 @@ import fs from "fs";
 import path from "path";
 import builtins from "builtin-modules";
 
+const MAIN_OUTPUT_PATH = path.join(__dirname, "dist", "main.js");
+
 const prod = process.argv[2] === "production";
 
 if (!prod) {
@@ -32,16 +34,12 @@ async function build() {
 
 	//Main file
 	const MAIN_ENTRYPOINT = path.join(__dirname, "plugin", "src", "main.ts");
-	const MAIN_OUTPUT_PATH = path.join(__dirname, "dist", "main.js");
 	await _buildBun(MAIN_ENTRYPOINT, "node");
 	_convertToCommonJS(MAIN_OUTPUT_PATH);
 
-	// //Server file
-	// const SERVER_ENTRYPOINT = path.join(__dirname, "server", "src", "index.ts");
-	// await _buildBun(SERVER_ENTRYPOINT, "bun");
-
 	//Manifest file
 	await _copyManifestFile();
+	await _removeImportMeta();
 }
 
 async function _buildBun(entrypoint, target) {
@@ -81,4 +79,22 @@ function _convertToCommonJS(inputPath) {
 		presets: ["@babel/preset-env"],
 	});
 	fs.writeFileSync(inputPath, transformed.code);
+}
+
+async function _removeImportMeta() {
+	try {
+		// Read the file
+		const data = await fs.promises.readFile(MAIN_OUTPUT_PATH, "utf8");
+
+		// Replace import.meta.require(id); with require(id);
+		const updatedData = data.replace(
+			/import\.meta\.require\(([^)]+)\);/g,
+			"require($1);"
+		);
+
+		// Write the updated content back to the file
+		await fs.promises.writeFile(MAIN_OUTPUT_PATH, updatedData, "utf8");
+	} catch (err) {
+		console.error("An error occurred:", err);
+	}
 }

@@ -38,6 +38,14 @@ NuThoughts uses a self-signed TLS certificate that is issued by a local certific
 8. Navigate to the file and click it
 9. Success. Your app is now configured to accept certificates issued from the certificate authority.
 
+### Server
+
+Obsidian doesn't automatically download the server file. Download the server file and place it into the `<your-vault>/.obsidian/plugins/obsidian-nuthoughts` folder.
+
+Be sure to give it executable access.
+
+`chmod +x <your-vault>/.obsidian/plugins/obsidian-nuthoughts/server`
+
 ## Usage
 
 When you open Obsidian, the server will automatically be running.
@@ -48,5 +56,6 @@ There is also a manual run server command if you disable run on start up.
 
 Bun updates
 
--   [ ] Bundle into plugin itself once Bun supports polyfill
--   [ ] Remove Babel once Bun supports CommonJS
+-   [ ] Redirect port 80 to port 443
+-   [ ] Bundle server into plugin once Bun supports polyfill
+-   [ ] Remove Babel once Bun supports CommonJS in bundler

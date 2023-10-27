@@ -26,15 +26,15 @@ export const handlePostThought = async (
 	}
 };
 
-const saveThought = async (thought: Thought, vaultPath: string) => {
+const saveThought = async (thought: Thought, savePath: string) => {
 	const { creationTime, text } = thought;
 	const fileName = `nuthought-${creationTime}.md`;
-	const filePath = path.join(vaultPath, fileName);
+	const filePath = path.join(savePath, fileName);
 
 	console.log("Saving thought to", filePath);
 
 	try {
-		await fs.promises.mkdir(vaultPath);
+		await fs.promises.mkdir(savePath);
 	} catch (err: unknown) {}
 
 	await Bun.write(filePath, text);

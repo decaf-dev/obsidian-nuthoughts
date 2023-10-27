@@ -1,5 +1,10 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, Notice, PluginSettingTab, Setting } from "obsidian";
+
+import { exec } from "child_process";
+
 import NuThoughtsPlugin from "./main";
+import { createCertificateAuthority } from "./tls";
+import { getCACertPath, getCAKeyPath, getPluginPath } from "./utils";
 
 export default class SettingsTab extends PluginSettingTab {
 	plugin: NuThoughtsPlugin;
@@ -97,6 +102,58 @@ export default class SettingsTab extends PluginSettingTab {
 						this.plugin.settings.certCommonName = value;
 						await this.plugin.saveSettings();
 					})
+			);
+
+		new Setting(containerEl)
+			.setName("Generate certificate authority")
+			.setDesc(
+				"Generates a new CA certificate and private key. You will need to install this certificate on your devices."
+			)
+			.addButton((btn) =>
+				btn.setButtonText("Generate").onClick(async () => {
+					try {
+						const result = createCertificateAuthority();
+
+						const caCertPath = getCACertPath(this.app, false);
+						const privateKeyPath = getCAKeyPath(this.app, false);
+						const pluginPath = getPluginPath(this.app, true);
+
+						await this.app.vault.adapter.write(
+							caCertPath,
+							result.certificate
+						);
+						await this.app.vault.adapter.write(
+							privateKeyPath,
+							result.privateKey
+						);
+						new Notice(
+							`Generated certificate authority at: ${pluginPath}. Please install this certificate on your devices.`
+						);
+					} catch (err) {
+						console.error(err);
+					}
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("TLS folder")
+			.setDesc(
+				"Opens the folder containing TLS certificates and private keys"
+			)
+			.addButton((btn) =>
+				btn.setButtonText("Open").onClick(() => {
+					const path = getPluginPath(this.app, true);
+					exec(`open -R ${path}`, (error, _stdout, stderr) => {
+						if (error) {
+							console.error(`Error: ${error.message}`);
+							return;
+						}
+						if (stderr) {
+							console.error(`Stderr: ${stderr}`);
+							return;
+						}
+					});
+				})
 			);
 	}
 }

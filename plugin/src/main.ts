@@ -5,6 +5,13 @@ import * as path from "path";
 import * as net from "net";
 
 import SettingsTab from "./settings-tab";
+import {
+	getCACertPath,
+	getCAKeyPath,
+	getPluginPath,
+	getVaultPath,
+} from "./utils";
+import { issueCertificate } from "./tls";
 
 interface NuThoughtsSettings {
 	serverPort: number;
@@ -86,31 +93,41 @@ export default class NuThoughtsPlugin extends Plugin {
 		this.updateServerStatus(true);
 		this.setupProcessConnection();
 
-		const vaultPath = (this.app.vault.adapter as any).basePath;
-		const serverExePath = path.join(
-			vaultPath,
-			".obsidian",
-			"plugins",
-			"obsidian-nuthoughts",
-			"server"
-		);
-
+		const vaultPath = getVaultPath(this.app);
+		const pluginPath = getPluginPath(this.app, true);
+		const serverPath = path.join(pluginPath, "server");
 		const savePath = path.join(vaultPath, this.settings.saveFolder);
+
+		const caKey = await this.app.vault.adapter.read(
+			getCAKeyPath(this.app, false)
+		);
+		const caCert = await this.app.vault.adapter.read(
+			getCACertPath(this.app, false)
+		);
 
 		const computerHostName = os.hostname().toLowerCase();
 		const certCommonName = this.settings.useHostNameAsCommonName
 			? computerHostName
 			: this.settings.certCommonName;
 
-		const childProcess = spawn(`${serverExePath}`, [
+		const cert = issueCertificate(
+			certCommonName,
+			[certCommonName, "localhost"],
+			caKey,
+			caCert
+		);
+
+		const childProcess = spawn(`${serverPath}`, [
 			this.settings.serverPort.toString(),
 			this.settings.heartbeatPort.toString(),
 			certCommonName,
+			cert.privateKey,
+			cert.certificate,
 			savePath,
 		]);
 
 		childProcess.stdout.on("data", (data) => {
-			console.log(data.toString().trim());
+			console.log(data.toString());
 		});
 		childProcess.stderr.on("data", (data) => {
 			console.error(data.toString());

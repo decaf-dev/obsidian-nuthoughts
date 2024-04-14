@@ -2,6 +2,7 @@ import { Thought } from "../types";
 import { validateFields } from "../validation";
 import * as path from "path";
 import * as fs from "fs";
+import * as moment from "moment";
 
 export const handlePostThought = async (
 	body: ReadableStream | null,
@@ -28,14 +29,30 @@ export const handlePostThought = async (
 
 const saveThought = async (thought: Thought, savePath: string) => {
 	const { creationTime, text } = thought;
+
 	const fileName = `nuthought-${creationTime}.md`;
 	const filePath = path.join(savePath, fileName);
+	const fileData = getFrontmatter(creationTime) + "\n" + text;
 
 	console.log("Saving thought to", filePath);
 
 	try {
 		await fs.promises.mkdir(savePath);
-	} catch (err: unknown) {}
+	} catch (err: unknown) { }
 
-	await Bun.write(filePath, text);
+	await Bun.write(filePath, fileData);
 };
+
+const getFrontmatter = (creationTime: number) => {
+	const dateTime = getDateTime(creationTime);
+	const lines: string[] = [];
+	lines.push("---");
+	lines.push(`creation: ${dateTime}`);
+	lines.push("---");
+	return lines.join("\n");
+}
+
+const getDateTime = (creationTime: number) => {
+	const momentDate = moment.unix(creationTime);
+	return momentDate.format("YYYY-MM-DDTHH:mm:ss");
+}

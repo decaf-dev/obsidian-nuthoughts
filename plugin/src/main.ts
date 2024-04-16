@@ -4,7 +4,7 @@ import * as os from "os";
 import * as path from "path";
 import * as net from "net";
 
-import SettingsTab from "./settings-tab";
+import NuThoughtsSettingsTab from "./obsidian/nuthoughts-settings-tab";
 import {
 	getCACertPath,
 	getCAKeyPath,
@@ -58,7 +58,7 @@ export default class NuThoughtsPlugin extends Plugin {
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SettingsTab(this.app, this));
+		this.addSettingTab(new NuThoughtsSettingsTab(this.app, this));
 
 		this.serverStatusEl = this.addStatusBarItem();
 		this.updateServerStatus(false);

@@ -2,11 +2,11 @@ import { App, Notice, PluginSettingTab, Setting } from "obsidian";
 
 import { exec } from "child_process";
 
-import NuThoughtsPlugin from "./main";
-import { createCertificateAuthority } from "./tls";
-import { getCACertPath, getCAKeyPath, getPluginPath } from "./utils";
+import NuThoughtsPlugin from "../main";
+import { createCertificateAuthority } from "../tls";
+import { getCACertPath, getCAKeyPath, getPluginPath } from "../utils";
 
-export default class SettingsTab extends PluginSettingTab {
+export default class NuThoughtsSettingsTab extends PluginSettingTab {
 	plugin: NuThoughtsPlugin;
 
 	constructor(app: App, plugin: NuThoughtsPlugin) {

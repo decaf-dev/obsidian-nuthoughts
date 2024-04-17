@@ -6,9 +6,9 @@ import fs from "fs";
 import path from "path";
 import builtins from "builtin-modules";
 
-const MAIN_OUTPUT_PATH = path.join(__dirname, "dist", "main.js");
-
 const prod = process.argv[2] === "production";
+const MAIN_OUTPUT_PATH = path.join(__dirname, "dist", "main.js");
+const throttleBuild = _.throttle(build, 0);
 
 if (!prod) {
 	const watcher = chokidar.watch(["src"], {
@@ -17,7 +17,6 @@ if (!prod) {
 
 	watcher.on("ready", () => {
 		console.log("watching for changes...");
-
 		watcher
 			.on("add", () => throttleBuild())
 			.on("change", () => throttleBuild())
@@ -26,8 +25,6 @@ if (!prod) {
 }
 
 build();
-
-const throttleBuild = _.throttle(build, 0);
 
 async function build() {
 	console.time("Done");
@@ -38,7 +35,7 @@ async function build() {
 
 	//Manifest file
 	await _copyManifestFile();
-	await _removeImportMeta();
+	await _replaceImportMeta();
 
 	console.timeEnd("Done");
 }
@@ -64,7 +61,7 @@ async function _buildBun(entrypoint) {
 			...builtins,
 		],
 		minify: prod,
-		target: "node",
+		target: "bun",
 	});
 }
 
@@ -82,16 +79,11 @@ function _convertToCommonJS(inputPath) {
 	fs.writeFileSync(inputPath, transformed.code);
 }
 
-async function _removeImportMeta() {
+async function _replaceImportMeta() {
 	try {
 		// Read the file
 		const data = await fs.promises.readFile(MAIN_OUTPUT_PATH, "utf8");
-
-		const importMetaRegex =
-			/var (\w+) = \(0, _nodeModule\.createRequire\)\(import\.meta\.url\);/g;
-		const replacement = `const { createRequire } = require('module');\nvar $1 = createRequire(__filename);`;
-
-		const updatedData = data.replace(importMetaRegex, replacement);
+		const updatedData = data.replace(/import\.meta\.require/g, "require");
 
 		// Write the updated content back to the file
 		await fs.promises.writeFile(MAIN_OUTPUT_PATH, updatedData, "utf8");

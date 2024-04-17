@@ -88,8 +88,8 @@ export default class NuThoughtsPlugin extends Plugin {
 			caCert = await this.app.vault.adapter.read(caCertPath);
 			caKey = await this.app.vault.adapter.read(caKeyPath);
 		} catch (err) {
-			console.error("Cannot start NuThoughts server. Please generate a certificate authority key and certificate from the settings tab.");
-			new Notice("Cannot start NuThoughts server. Please generate a certificate authority key and certificate from the settings tab.");
+			console.error("Cannot start NuThoughts server. Please generate a certificate authority in the settings tab.");
+			new Notice("Cannot start NuThoughts server. Please generate a certificate authority in the settings tab.");
 			return;
 		}
 

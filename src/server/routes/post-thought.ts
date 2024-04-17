@@ -87,6 +87,6 @@ const getFrontmatter = (creationTime: number) => {
 }
 
 const getDateTime = (creationTime: number) => {
-	const momentDate = moment.unix(creationTime);
+	const momentDate = moment(creationTime);
 	return momentDate.format("YYYY-MM-DDTHH:mm:ss");
 }

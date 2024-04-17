@@ -1,30 +1,24 @@
 # NuThoughts
 
+NuThoughts is an Obsidian plugin that runs an Express.JS server. It allows a [NuThoughts app](https://github.com/trey-wallis/nuthoughts) to send data to an Obsidian vault.
+
 ## About
 
-This is an Obsidian plugin that runs a Bun.sh server. It allows a [NuThoughts app](https://github.com/trey-wallis/nuthoughts) to send data to an Obsidian vault.
+-   [Installation](#installation)
+-   [Certificate authority](#certificate-authority)
+-   [Usage](#usage)
+-   [Development](#development)
 
 ## Installation
 
-### Plugin
-
-#### From release
-
-1. Install the plugin using [Obsidian BRAT](https://github.com/TfTHacker/obsidian42-brat)
+1. Install the [Obsidian BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin from Obsidian community plugin store
 2. Enable the plugin
+3. Open the plugin settings
+4. Click **Add beta plugin**
+5. Enter the repository url: **https://github.com/trey-wallis/obsidian-note-splitter**
+6. Click **Add plugin**
 
-#### From clone
-
-1. Clone the github repository
-2. Install [bun](https://bun.sh)
-3. Build the project `bun run build`
-4. Add a symbolic link to your vault's plugin folder
-
--   `ln -s /obsidian-nuthoughts/dist /.obsidian/plugins/obsidian-nuthoughts`
-
-5. Enable the plugin
-
-### Certificate authority
+## Certificate authority
 
 NuThoughts uses a self-signed TLS certificate that is issued by a local certificate authority.
 
@@ -38,24 +32,21 @@ NuThoughts uses a self-signed TLS certificate that is issued by a local certific
 8. Navigate to the file and click it
 9. Success. Your app is now configured to accept certificates issued from the certificate authority.
 
-### Server
-
-Obsidian doesn't automatically download the server file. Download the server file and place it into the `<your-vault>/.obsidian/plugins/obsidian-nuthoughts` folder.
-
-Be sure to give it executable access.
-
-`chmod +x <your-vault>/.obsidian/plugins/obsidian-nuthoughts/server`
-
 ## Usage
 
-When you open Obsidian, the server will automatically be running.
+When you open first Obsidian, the server will automatically be running.
 
 There is also a manual run server command if you disable run on start up.
 
-## Roadmap
+## Development
 
-Bun updates
+### By clone
 
--   [ ] Redirect port 80 to port 443
--   [ ] Bundle server into plugin once Bun supports polyfill
--   [ ] Remove Babel once Bun supports CommonJS in bundler
+1. Clone the github repository
+2. Install [bun](https://bun.sh)
+3. Build the project `bun run build`
+4. Add a symbolic link to your vault's plugin folder
+
+-   `ln -s /obsidian-nuthoughts/dist /.obsidian/plugins/obsidian-nuthoughts`
+
+5. Enable the plugin

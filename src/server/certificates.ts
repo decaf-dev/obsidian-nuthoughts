@@ -3,6 +3,7 @@ import * as forge from "node-forge";
 const RSA_KEY_SIZE = 4096;
 const CA_COMMON_NAME = "NuThoughts";
 
+//Creates a certificate authority
 export const createCertificateAuthority = () => {
 	// Generate a keypair
 	const keys = forge.pki.rsa.generateKeyPair(RSA_KEY_SIZE);

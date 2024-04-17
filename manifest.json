@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-nuthoughts",
-	"name": "NuThoughts server",
-	"version": "0.3.0",
+	"name": "NuThoughts",
+	"version": "0.4.0",
 	"minAppVersion": "1.4.0",
 	"description": "NuThoughts server for Obsidian",
 	"author": "Trey Wallis",

@@ -25,7 +25,6 @@ jobs:
               run: |
                   bun install
                   bun run build
-                  bun run binary
 
             # Create the release on GitHub
             - name: Release
@@ -37,4 +36,3 @@ jobs:
                   files: |
                       dist/main.js
                       dist/manifest.json
-                      dist/server

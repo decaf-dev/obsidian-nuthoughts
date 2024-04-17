@@ -6,18 +6,17 @@ import fs from "fs";
 import path from "path";
 import builtins from "builtin-modules";
 
-const MAIN_OUTPUT_PATH = path.join(__dirname, "dist", "main.js");
-
 const prod = process.argv[2] === "production";
+const MAIN_OUTPUT_PATH = path.join(__dirname, "dist", "main.js");
+const throttleBuild = _.throttle(build, 0);
 
 if (!prod) {
-	const watcher = chokidar.watch(["plugin/", "server/"], {
+	const watcher = chokidar.watch(["src"], {
 		persistent: true,
 	});
 
 	watcher.on("ready", () => {
 		console.log("watching for changes...");
-
 		watcher
 			.on("add", () => throttleBuild())
 			.on("change", () => throttleBuild())
@@ -27,22 +26,21 @@ if (!prod) {
 
 build();
 
-const throttleBuild = _.throttle(build, 0);
-
 async function build() {
-	console.log("rebuilding...");
-
+	console.time("Done");
 	//Main file
-	const MAIN_ENTRYPOINT = path.join(__dirname, "plugin", "src", "main.ts");
-	await _buildBun(MAIN_ENTRYPOINT, "node");
+	const MAIN_ENTRYPOINT = path.join(__dirname, "src", "main.ts");
+	await _buildBun(MAIN_ENTRYPOINT);
 	_convertToCommonJS(MAIN_OUTPUT_PATH);
 
 	//Manifest file
 	await _copyManifestFile();
-	await _removeImportMeta();
+	await _replaceImportMeta();
+
+	console.timeEnd("Done");
 }
 
-async function _buildBun(entrypoint, target) {
+async function _buildBun(entrypoint) {
 	return Bun.build({
 		entrypoints: [entrypoint],
 		outdir: path.join(__dirname, "dist"),
@@ -63,7 +61,7 @@ async function _buildBun(entrypoint, target) {
 			...builtins,
 		],
 		minify: prod,
-		target,
+		target: "bun",
 	});
 }
 
@@ -81,16 +79,11 @@ function _convertToCommonJS(inputPath) {
 	fs.writeFileSync(inputPath, transformed.code);
 }
 
-async function _removeImportMeta() {
+async function _replaceImportMeta() {
 	try {
 		// Read the file
 		const data = await fs.promises.readFile(MAIN_OUTPUT_PATH, "utf8");
-
-		// Replace import.meta.require(id); with require(id);
-		const updatedData = data.replace(
-			/import\.meta\.require\(([^)]+)\);/g,
-			"require($1);"
-		);
+		const updatedData = data.replace(/import\.meta\.require/g, "require");
 
 		// Write the updated content back to the file
 		await fs.promises.writeFile(MAIN_OUTPUT_PATH, updatedData, "utf8");

@@ -6,8 +6,8 @@ export class InvalidTypesError extends Error {
 			`Invalid type on fields: [${fields
 				.map((field) => field.name)
 				.join(",")}]. Received: [${fields.map(
-				(field) => typeof field.value
-			)}]. Expected: [${fields.map((field) => field.expectedType)}].`
+					(field) => typeof field.value
+				)}]. Expected: [${fields.map((field) => field.expectedType)}].`
 		);
 		this.name = "InvalidTypesError";
 	}

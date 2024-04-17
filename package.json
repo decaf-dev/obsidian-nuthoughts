@@ -4,7 +4,7 @@
 	"description": "NuThoughts server for Obsidian",
 	"main": "main.js",
 	"scripts": {
-		"dev": "node esbuild.config.mjs",
+		"dev": "bun bun.build.js development",
 		"build": "tsc -noEmit -skipLibCheck && bun bun.build.js production"
 	},
 	"keywords": [],

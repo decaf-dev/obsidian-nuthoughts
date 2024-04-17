@@ -22,9 +22,9 @@ if (!prod) {
 			.on("change", () => throttleBuild())
 			.on("unlink", () => throttleBuild());
 	});
+} else {
+	build();
 }
-
-build();
 
 async function build() {
 	console.time("Done");

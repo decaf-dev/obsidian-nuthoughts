@@ -88,8 +88,8 @@ export default class NuThoughtsPlugin extends Plugin {
 			caCert = await this.app.vault.adapter.read(caCertPath);
 			caKey = await this.app.vault.adapter.read(caKeyPath);
 		} catch (err) {
-			console.error("Cannot start server: missing CA key or certificate");
-			new Notice("Cannot start NuThoughts server. Please generate a CA key and certificate first from the settings tab.");
+			console.error("Cannot start NuThoughts server. Please generate a certificate authority key and certificate from the settings tab.");
+			new Notice("Cannot start NuThoughts server. Please generate a certificate authority key and certificate from the settings tab.");
 			return;
 		}
 
@@ -101,6 +101,8 @@ export default class NuThoughtsPlugin extends Plugin {
 			: certCommonName;
 
 
+		//Issue a new certificate for the server
+		//each time the server is started
 		const issuedCert = issueCertificate(
 			commonName,
 			[commonName, "localhost"],

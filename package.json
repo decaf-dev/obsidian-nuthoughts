@@ -5,8 +5,7 @@
 	"main": "main.js",
 	"scripts": {
 		"dev": "bun bun.build.js",
-		"build": "bun bun.build.js production",
-		"binary": "bun build --compile --minify ./server/src/index.js --outfile ./dist/server"
+		"build": "bun bun.build.js production"
 	},
 	"keywords": [],
 	"author": "Trey Wallis",

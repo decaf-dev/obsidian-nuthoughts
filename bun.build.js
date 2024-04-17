@@ -11,7 +11,7 @@ const MAIN_OUTPUT_PATH = path.join(__dirname, "dist", "main.js");
 const prod = process.argv[2] === "production";
 
 if (!prod) {
-	const watcher = chokidar.watch(["plugin/", "server/"], {
+	const watcher = chokidar.watch(["plugin/"], {
 		persistent: true,
 	});
 

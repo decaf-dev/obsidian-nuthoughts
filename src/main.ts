@@ -132,9 +132,9 @@ export default class NuThoughtsPlugin extends Plugin {
 	}
 
 	private updateStatusBar(isOn: boolean) {
-		let text = "NuThoughts is inactive";
+		let text = "NuThoughts is stopped";
 		if (isOn) {
-			text = "NuThoughts is active";
+			text = "NuThoughts is running";
 		}
 
 		this.serverStatusBarEl.setText(text);

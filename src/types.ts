@@ -4,4 +4,5 @@ export interface NuThoughtsSettings {
 	certCommonName: string;
 	useHostNameAsCommonName: boolean;
 	saveFolder: string;
+	shouldDebug: boolean;
 }

@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS: NuThoughtsSettings = {
 	certCommonName: "",
 	useHostNameAsCommonName: true,
 	saveFolder: "",
+	shouldDebug: false,
 };
 
 export default class NuThoughtsPlugin extends Plugin {

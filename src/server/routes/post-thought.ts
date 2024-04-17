@@ -38,9 +38,12 @@ export const handlePostThought = async (req: Request, res: Response, next: NextF
 		return;
 	}
 
-	console.log("Received thought:", creationTime, text);
+	const { saveFolder, shouldDebug } = settings;
 
-	const { saveFolder } = settings;
+	if (shouldDebug) {
+		console.log("Received thought:", creationTime, text);
+	}
+
 	const filePath = await saveThought(obsidianApp, saveFolder, {
 		creationTime,
 		text,

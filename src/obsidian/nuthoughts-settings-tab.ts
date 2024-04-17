@@ -141,5 +141,16 @@ export default class NuThoughtsSettingsTab extends PluginSettingTab {
 					});
 				})
 			);
+
+		new Setting(containerEl).setHeading().setName("Debug");
+
+		new Setting(containerEl).setName("Enable log messages").addToggle((toggle) =>
+			toggle
+				.setValue(this.plugin.settings.shouldDebug)
+				.onChange(async (value) => {
+					this.plugin.settings.shouldDebug = value;
+					await this.plugin.saveSettings();
+				})
+		);
 	}
 }

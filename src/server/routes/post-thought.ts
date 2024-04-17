@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { validateFields } from "../validation";
-import { Notice, moment } from "obsidian";
+import { moment } from "obsidian";
 
 import * as path from "path";
 
@@ -39,19 +39,18 @@ export const handlePostThought = async (req: Request, res: Response, next: NextF
 	}
 
 	const { saveFolder } = settings;
-	const result = await saveThought(obsidianApp, saveFolder, {
+	const filePath = await saveThought(obsidianApp, saveFolder, {
 		creationTime,
 		text,
-	});
-	if (result === null) {
-		next("Error saving thought");
+	}, next);
+	if (filePath === null) {
 		return;
 	}
 
-	res.send(`Thought saved: ${result}`);
+	res.status(201).json({ message: `Thought saved: ${filePath}` });
 }
 
-const saveThought = async (obsidianApp: App, saveFolder: string, thought: Thought) => {
+const saveThought = async (obsidianApp: App, saveFolder: string, thought: Thought, next: NextFunction) => {
 	const { creationTime, text } = thought;
 
 	const fileName = `nuthought-${creationTime}.md`;
@@ -59,11 +58,16 @@ const saveThought = async (obsidianApp: App, saveFolder: string, thought: Though
 	const data = getFrontmatter(creationTime) + "\n" + text;
 
 	try {
+		const folderExists = await obsidianApp.vault.adapter.exists(saveFolder);
+		if (!folderExists) {
+			await obsidianApp.vault.createFolder(saveFolder);
+		}
 		await obsidianApp.vault.create(filePath, data);
 		return filePath;
 	} catch (err: unknown) {
-		console.error(`Error saving thought: ${err}`);
-		new Notice(`Error saving thought: ${err}`);
+		const error = err as Error;
+		console.error(`Error saving thought: ${error.message}`);
+		next(`Error saving thought: ${error.message}`);
 		return null;
 	}
 };

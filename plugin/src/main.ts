@@ -1,31 +1,19 @@
 import { Notice, Plugin } from "obsidian";
-import { ChildProcess, spawn } from "child_process";
+
 import * as os from "os";
-import * as path from "path";
-import * as net from "net";
 
 import NuThoughtsSettingsTab from "./obsidian/nuthoughts-settings-tab";
 import {
 	getCACertPath,
 	getCAKeyPath,
-	getPluginPath,
-	getVaultPath,
 } from "./server/utils";
 import { issueCertificate } from "./server/certificates";
-
-interface NuThoughtsSettings {
-	serverPort: number;
-	heartbeatPort: number;
-	shouldRunOnStartup: boolean;
-	certCommonName: string;
-	useHostNameAsCommonName: boolean;
-	saveFolder: string;
-}
+import Server from "./server";
+import { NuThoughtsSettings } from "./types";
 
 const DEFAULT_SETTINGS: NuThoughtsSettings = {
 	shouldRunOnStartup: true,
-	serverPort: 8123,
-	heartbeatPort: 8124,
+	port: 8123,
 	certCommonName: "",
 	useHostNameAsCommonName: true,
 	saveFolder: "",
@@ -33,35 +21,21 @@ const DEFAULT_SETTINGS: NuThoughtsSettings = {
 
 export default class NuThoughtsPlugin extends Plugin {
 	settings: NuThoughtsSettings;
-	serverStatusEl: HTMLElement;
+	serverStatusBarEl: HTMLElement;
 	isServerRunning: boolean;
-	serverProcess: ChildProcess | null;
-	heartbeatServer: net.Server | null;
+	server: Server;
 
 	async onload() {
+		this.server = new Server();
+
 		await this.loadSettings();
 
-		this.addCommand({
-			id: "start-server",
-			name: "Start server",
-			callback: () => {
-				this.runServer();
-			},
-		});
+		this.registerCommands();
 
-		this.addCommand({
-			id: "stop-server",
-			name: "Stop server",
-			callback: () => {
-				this.stopServer();
-			},
-		});
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new NuThoughtsSettingsTab(this.app, this));
 
-		this.serverStatusEl = this.addStatusBarItem();
-		this.updateServerStatus(false);
+		this.serverStatusBarEl = this.addStatusBarItem();
+		this.updateStatusBar(false);
 
 		this.app.workspace.onLayoutReady(async () => {
 			if (this.settings.shouldRunOnStartup) {
@@ -84,100 +58,83 @@ export default class NuThoughtsPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
+	private registerCommands() {
+		this.addCommand({
+			id: "start-server",
+			name: "Start server",
+			callback: () => this.runServer()
+		});
+
+		this.addCommand({
+			id: "stop-server",
+			name: "Stop server",
+			callback: () => this.stopServer()
+		});
+	}
+
 	private async runServer() {
 		if (this.isServerRunning) {
 			new Notice("NuThoughts server is already running");
 			return;
 		}
 
-		this.updateServerStatus(true);
-		this.setupProcessConnection();
 
-		const vaultPath = getVaultPath(this.app);
-		const pluginPath = getPluginPath(this.app, true);
-		const serverPath = path.join(pluginPath, "server");
-		const savePath = path.join(vaultPath, this.settings.saveFolder);
+		let caCert: string | null = null;
+		let caKey: string | null = null;
+		try {
+			const caKeyPath = getCAKeyPath(this.app);
+			const caCertPath = getCACertPath(this.app);
 
-		const caKey = await this.app.vault.adapter.read(
-			getCAKeyPath(this.app, false)
-		);
-		const caCert = await this.app.vault.adapter.read(
-			getCACertPath(this.app, false)
-		);
+			caCert = await this.app.vault.adapter.read(caCertPath);
+			caKey = await this.app.vault.adapter.read(caKeyPath);
+		} catch (err) {
+			console.error("Cannot start server: missing CA key or certificate");
+			new Notice("Cannot start NuThoughts server. Please generate a CA key and certificate first from the settings tab.");
+			return;
+		}
+
+		const { useHostNameAsCommonName, certCommonName } = this.settings;
 
 		const computerHostName = os.hostname().toLowerCase();
-		const certCommonName = this.settings.useHostNameAsCommonName
+		const commonName = useHostNameAsCommonName
 			? computerHostName
-			: this.settings.certCommonName;
+			: certCommonName;
 
-		const cert = issueCertificate(
-			certCommonName,
-			[certCommonName, "localhost"],
+
+		const issuedCert = issueCertificate(
+			commonName,
+			[commonName, "localhost"],
 			caKey,
 			caCert
 		);
 
-		const childProcess = spawn(`${serverPath}`, [
-			this.settings.serverPort.toString(),
-			this.settings.heartbeatPort.toString(),
-			certCommonName,
-			cert.privateKey,
-			cert.certificate,
-			savePath,
-		]);
+		const { port } = this.settings;
+		const result = await this.server.start(this.app, this.settings, commonName, port, issuedCert.certificate, issuedCert.privateKey);
+		if (!result) return;
 
-		childProcess.stdout.on("data", (data) => {
-			console.log(data.toString());
-		});
-		childProcess.stderr.on("data", (data) => {
-			console.error(data.toString());
-			if (data.includes("EADDRINUSE")) {
-				new Notice("NuThoughts server failed to start");
-				this.isServerRunning = false;
-				return;
-			} else {
-				this.stopServer();
-			}
-		});
-
-		this.serverProcess = childProcess;
 		this.isServerRunning = true;
-	}
+		this.updateStatusBar(true);
 
-	private setupProcessConnection() {
-		const server = net.createServer((socket) => {
-			socket.on("end", () => {
-				console.log("Client disconnected");
-			});
-		});
-
-		server.listen(this.settings.heartbeatPort, () => {
-			// console.log(
-			// 	`Heartbeat server listening on port: ${this.settings.heartbeatPort}`
-			// );
-		});
-		this.heartbeatServer = server;
+		new Notice(`Started NuThoughts server on port ${port}`);
 	}
 
 	private stopServer() {
 		if (!this.isServerRunning) {
-			new Notice("NuThoughts server is already stopped");
 			return;
 		}
 
-		this.updateServerStatus(false);
+		this.server.close();
+		this.updateStatusBar(false);
 		this.isServerRunning = false;
-		this.serverProcess?.kill();
-		this.serverProcess = null;
-		this.heartbeatServer?.close();
-		this.heartbeatServer = null;
 		new Notice("Stopped NuThoughts server");
 	}
 
-	private updateServerStatus(isOn: boolean) {
-		let text = "NuThoughts stopped";
-		if (isOn) text = "NuThoughts running";
+	private updateStatusBar(isOn: boolean) {
+		let text = "NuThoughts is inactive";
+		if (isOn) {
+			text = "NuThoughts is active";
+		}
 
-		this.serverStatusEl.setText(text);
+		this.serverStatusBarEl.setText(text);
 	}
 }

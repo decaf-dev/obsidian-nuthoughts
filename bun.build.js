@@ -30,8 +30,7 @@ build();
 const throttleBuild = _.throttle(build, 0);
 
 async function build() {
-	console.log("Building Obsidian NuThoughts...");
-
+	console.time("Done");
 	//Main file
 	const MAIN_ENTRYPOINT = path.join(__dirname, "plugin", "src", "main.ts");
 	await _buildBun(MAIN_ENTRYPOINT, "node");
@@ -40,6 +39,8 @@ async function build() {
 	//Manifest file
 	await _copyManifestFile();
 	await _removeImportMeta();
+
+	console.timeEnd("Done");
 }
 
 async function _buildBun(entrypoint, target) {

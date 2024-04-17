@@ -33,29 +33,15 @@ export default class NuThoughtsSettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Server port")
+			.setName("Port")
 			.setDesc(
-				"The port to run the http server on. Defaults to 8123 if not set"
+				"The port to run the express server on. Defaults to 8123 if not set"
 			)
 			.addText((text) =>
 				text
-					.setValue(this.plugin.settings.serverPort.toString())
+					.setValue(this.plugin.settings.port.toString())
 					.onChange(async (value) => {
-						this.plugin.settings.serverPort = Number(value);
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("Heartbeat port")
-			.setDesc(
-				"The port to run the heartbeat server on. This is necessary to clean up the child process when Obsidian closes. Defaults to 8124 if not set"
-			)
-			.addText((text) =>
-				text
-					.setValue(this.plugin.settings.heartbeatPort.toString())
-					.onChange(async (value) => {
-						this.plugin.settings.heartbeatPort = Number(value);
+						this.plugin.settings.port = Number(value);
 						await this.plugin.saveSettings();
 					})
 			);
@@ -114,8 +100,8 @@ export default class NuThoughtsSettingsTab extends PluginSettingTab {
 					try {
 						const result = createCertificateAuthority();
 
-						const caCertPath = getCACertPath(this.app, false);
-						const privateKeyPath = getCAKeyPath(this.app, false);
+						const caCertPath = getCACertPath(this.app);
+						const privateKeyPath = getCAKeyPath(this.app);
 						const pluginPath = getPluginPath(this.app, true);
 
 						await this.app.vault.adapter.write(

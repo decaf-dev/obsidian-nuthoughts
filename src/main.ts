@@ -116,8 +116,6 @@ export default class NuThoughtsPlugin extends Plugin {
 
 		this.isServerRunning = true;
 		this.updateStatusBar(true);
-
-		new Notice(`Started NuThoughts server on port ${port}`);
 	}
 
 	private stopServer() {

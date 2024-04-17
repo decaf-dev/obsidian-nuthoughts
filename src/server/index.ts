@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import https from "https";
-import { App } from "obsidian";
+import { App, Notice } from "obsidian";
 import { handlePostThought } from "./routes/post-thought";
 import { NuThoughtsSettings } from "../types";
 
@@ -38,6 +38,7 @@ export default class Server {
 			this.server = https.createServer(options, app).listen(port);
 
 			console.log(`NuThoughts listening at: https://${domain}:${port}`);
+			new Notice(`NuThoughts listening at: https://${domain}:${port}`);
 			return true;
 		} catch (err) {
 			console.error(`Error starting Nuthoughts server: ${err}`);

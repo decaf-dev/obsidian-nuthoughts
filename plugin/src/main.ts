@@ -10,8 +10,8 @@ import {
 	getCAKeyPath,
 	getPluginPath,
 	getVaultPath,
-} from "./utils";
-import { issueCertificate } from "./tls";
+} from "./server/utils";
+import { issueCertificate } from "./server/certificates";
 
 interface NuThoughtsSettings {
 	serverPort: number;

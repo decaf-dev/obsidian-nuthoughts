@@ -5,7 +5,7 @@ import { handlePostThought } from "./routes/post-thought";
 import { NuThoughtsSettings } from "../types";
 
 export default class Server {
-	server: any | null = null;
+	server: https.Server | null = null;
 
 	async start(obsidianApp: App, settings: NuThoughtsSettings, domain: string, port: number, tlsCertificate: string, tlsPrivateKey: string) {
 		try {
@@ -23,9 +23,6 @@ export default class Server {
 			app.post("/thought", async (req, res, next) => handlePostThought(req, res, next, obsidianApp, settings));
 
 			this.server = https.createServer(options, app).listen(port);
-			// this.server.on('error', (error) => {
-			// 	throw error;
-			// });
 
 			console.log(`NuThoughts listening at: https://${domain}:${port}`);
 			return true;

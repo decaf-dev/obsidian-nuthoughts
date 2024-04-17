@@ -30,7 +30,7 @@ build();
 const throttleBuild = _.throttle(build, 0);
 
 async function build() {
-	console.log("rebuilding...");
+	console.log("Building Obsidian NuThoughts...");
 
 	//Main file
 	const MAIN_ENTRYPOINT = path.join(__dirname, "plugin", "src", "main.ts");

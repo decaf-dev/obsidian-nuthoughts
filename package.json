@@ -8,7 +8,7 @@
 		"build": "tsc -noEmit -skipLibCheck && bun bun.build.js production"
 	},
 	"keywords": [],
-	"author": "Trey Wallis",
+	"author": "DecafDev",
 	"license": "MIT",
 	"devDependencies": {
 		"@babel/cli": "^7.24.1",

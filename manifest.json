@@ -4,8 +4,8 @@
 	"version": "0.4.2",
 	"minAppVersion": "1.4.0",
 	"description": "NuThoughts server for Obsidian",
-	"author": "Trey Wallis",
-	"authorUrl": "https://github.com/trey-wallis",
-	"fundingUrl": "https://buymeacoffee.com/trey-wallis",
+	"author": "DecafDev",
+	"authorUrl": "https://github.com/decaf-dev",
+	"fundingUrl": "https://buymeacoffee.com/decaf_dev",
 	"isDesktopOnly": true
 }

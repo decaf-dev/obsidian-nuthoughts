@@ -1,6 +1,6 @@
 # NuThoughts
 
-NuThoughts is an Obsidian plugin that runs an Express.JS server. It allows a [NuThoughts app](https://github.com/trey-wallis/nuthoughts) to send data to an Obsidian vault.
+NuThoughts is an Obsidian plugin that runs an Express.JS server. It allows a [NuThoughts app](https://github.com/decaf-dev/nuthoughts) to send data to an Obsidian vault.
 
 ## About
 
@@ -15,7 +15,7 @@ NuThoughts is an Obsidian plugin that runs an Express.JS server. It allows a [Nu
 2. Enable the plugin
 3. Open the plugin settings
 4. Click **Add beta plugin**
-5. Enter the repository url: **https://github.com/trey-wallis/obsidian-note-splitter**
+5. Enter the repository url: **https://github.com/decaf_dev/obsidian-nuthoughts**
 6. Click **Add plugin**
 
 ## Certificate authority
